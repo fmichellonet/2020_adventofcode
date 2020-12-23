@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace AdventOfCode.Tests.D4
+﻿namespace AdventOfCode.Tests.D4
 {
     using System.Linq;
     using AdventOfCode.D4;
@@ -1170,7 +1166,7 @@ byr:1937 iyr:2017 cid:147 hgt:183cm";
             const string sample = @"iyr:2013 ecl:amb cid:350 eyr:2023 pid:028048884
 hcl:#cfa07d byr:1929";
 
-            RequiredPassportValidator validator = new RequiredPassportValidator();
+            var validator = new RequiredPassportValidator();
             var d4 = new PassportProcessing(validator);
             var passport = d4.Map(sample);
 
@@ -1187,7 +1183,7 @@ eyr:2024
 ecl:brn pid:760753108 byr:1931
 hgt:179cm";
 
-            RequiredPassportValidator validator = new RequiredPassportValidator();
+            var validator = new RequiredPassportValidator();
             var d4 = new PassportProcessing(validator);
             var passport = d4.Map(sample);
 
