@@ -38,14 +38,17 @@
             int instructionCounter = 0;
             var context = new ExecutionContext(instructionPointer);
             Dictionary<int, int> pointerToCounter = new Dictionary<int, int>();
+            Stack<KeyValuePair<int, Instruction>> stack = new Stack<KeyValuePair<int, Instruction>>();
 
             while (true)
             {
                 var instruction = instructions.ElementAt(instructionPointer);
 
+                stack.Push(new KeyValuePair<int, Instruction>(instructionPointer, instruction));
+
                 if (pointerToCounter.ContainsKey(instructionPointer))
                 {
-                    return ExecutionResult.InfiniteLoop(context.Accumulator);
+                    return ExecutionResult.InfiniteLoop(context.Accumulator, stack);
                 }
 
                 instruction.Execute(context);
@@ -55,7 +58,7 @@
 
                 if (instruction == instructions.Last())
                 {
-                    return ExecutionResult.Ok(context.Accumulator);
+                    return ExecutionResult.Ok(context.Accumulator, stack);
                 }
 
                 if (context.InstructionPointer == instructionPointer)
@@ -70,33 +73,35 @@
 
     public abstract class ExecutionResult
     {
-        protected int _accumulator;
+        public int Accumulator { get; }
 
-        public int Accumulator => _accumulator;
+        public Stack<KeyValuePair<int, Instruction>> Stack { get; }
 
-        protected ExecutionResult(int accumulator)
+        protected ExecutionResult(int accumulator, Stack<KeyValuePair<int, Instruction>> stack)
         {
-            _accumulator = accumulator;
+            Accumulator = accumulator;
+            Stack = stack;
         }
 
-        public static InfiniteLoopResult InfiniteLoop(int accumulator)
+        public static InfiniteLoopResult InfiniteLoop(int accumulator, Stack<KeyValuePair<int, Instruction>> stack)
         {
-            return new InfiniteLoopResult(accumulator);
+            return new InfiniteLoopResult(accumulator, stack);
         }
 
-        public static OkResult Ok(int accumulator)
+        public static OkResult Ok(int accumulator, Stack<KeyValuePair<int, Instruction>> stack)
         {
-            return new OkResult(accumulator);
+            return new OkResult(accumulator, stack);
         }
 
         public class InfiniteLoopResult : ExecutionResult {
-            public InfiniteLoopResult(int accumulator) : base(accumulator)
+            public InfiniteLoopResult(int accumulator, Stack<KeyValuePair<int, Instruction>> stack) : base(accumulator, stack)
             {
             }
         }
 
         public class OkResult : ExecutionResult {
-            public OkResult(int accumulator) : base(accumulator)
+
+            public OkResult(int accumulator, Stack<KeyValuePair<int, Instruction>> stack) : base(accumulator, stack)
             {
             }
         }
